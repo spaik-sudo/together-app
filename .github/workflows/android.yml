@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,14 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Устанавливаем JDK 17 (Android требует)
+      # Устанавливаем JDK 17
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Кэш для Gradle, чтобы ускорить сборку
+      # Кэш для Gradle
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -33,11 +34,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Сборка проекта
+      # Сборка: если есть gradlew — используем его, иначе gradle
       - name: Build with Gradle
-        run: ./gradlew build
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+            ./gradlew assembleDebug
+          else
+            gradle assembleDebug
+          fi
 
-      # Сохраняем APK как артефакт
+      # Загружаем APK как артефакт
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
