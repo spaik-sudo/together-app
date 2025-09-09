@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Устанавливаем JDK 17 (Gradle 8+ требует минимум Java 17)
+      # Устанавливаем JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -24,16 +24,15 @@ jobs:
 
       # Делаем gradlew исполняемым
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x gradlew
 
-      # Собираем проект (корень = together-app)
+      # Собираем проект из корня
       - name: Build with Gradle
         run: ./gradlew build
-        working-directory: together-app
 
-      # Сохраняем apk как артефакт
+      # Загружаем apk как артефакт
       - name: Upload build outputs
         uses: actions/upload-artifact@v4
         with:
           name: app-build
-          path: together-app/app/build/outputs/
+          path: app/build/outputs/
